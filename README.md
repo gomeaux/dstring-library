@@ -5,3 +5,5 @@ after the way you use file pointers in C. A dstring has to be initialized like a
 pointer needs to be closed. Resizing of the dstring is not automatic, but must be done by the user using a resize function. I should also
 also mention it's called a "dstring" because its short for "dynamic string" since you can change it's size. Check main.c and dstring.h for
 how to use a dstring.
+
+let me know if something sucks or doesn't work and I might get around to fixing it.
