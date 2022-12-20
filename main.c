@@ -20,7 +20,7 @@ int main() {
     // readdstr gets a line from the file. use stdin to get keyboard
     // input from the user
     printf("Enter string: ");
-    readdstr(dstr, stdin);
+    staticsize_readdstr(dstr, stdin);
 
     // Use the getter functions to get the dstring attributes
     printf("\nString Attributes:\n");
