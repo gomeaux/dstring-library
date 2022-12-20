@@ -1,9 +1,9 @@
 # dstring-library
 
-dstring.h is a C header file I made as an exercise, and also because I don't like dealing with the garbage that are C strings. I modeled it
-after the way you use file pointers in C. A dstring has to be initialized like a file pointer needs to be opened, and destroyed like a file
-pointer needs to be closed. Resizing of the dstring is not automatic, but must be done by the user using a resize function. I should also
-also mention it's called a "dstring" because its short for "dynamic string" since you can change it's size. Check main.c and dstring.h for
-how to use a dstring.
+The dstring.h header file is a library I made partially for a fun exercise, and also
+to vent some frustration with the way C strings are. A dstring can be dynamically
+resized, and has its buffer size stored inside it. Check the main.c file for reference
+on how to use the library and its functions. It should be pretty simple, considering a
+dstring is just a char* and size_t inside a struct. 
 
-let me know if something sucks or doesn't work and I might get around to fixing it.
+Let me know if something sucks. Might fix it, might not log on for another 4 months. idk.
