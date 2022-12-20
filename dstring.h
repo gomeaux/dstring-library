@@ -81,7 +81,7 @@ dstring* initdstr() {
 
 // Deletes the dstring
 int freedstr(dstring* dstr) {
-    //free(dstr->str);
+    //free(dstr->str);+++++++++++++++++++++++++
     free(dstr);
     free(dstr->str);
     return 0;
@@ -123,7 +123,7 @@ char* getdstr(dstring* dstr) {
 
 // Read a line from a file into the dstring
 // set 'fp' to 'stdin' for keyboard input
-int readdstr(dstring* dstr, FILE* fp) {
+int staticsize_readdstr(dstring* dstr, FILE* fp) {
 	char* input = (char*)malloc(sizeof(char) * dstr->buf);
 	size_t i = 0;
 	fgets(input, dstr->buf, fp);
@@ -137,4 +137,45 @@ int readdstr(dstring* dstr, FILE* fp) {
 	}
 	free(input);
 	return 0;
+}
+
+// Same as 'readdstr' but it automatically resizes the
+// dstring to fit the inputted string
+// Returns how many by how many chars the dstring increased
+int autoresize_readdstr(dstring* dstr, FILE* fp) {
+
+    // Variables
+    char* input = (char*)malloc(sizeof(char) * dstr->buf);
+    size_t i = 0;
+    char c = 0;
+
+    // Read input from stdin
+    fgets(input, dstr->buf, fp);
+	for (i = 0; i < dstr->buf; i++) {
+		if (input[i] == '\n') {
+			dstr->str[i] = '\0';
+			break;
+		} else {
+			dstr->str[i] = input[i];
+		}
+	}
+
+    // Read any 'leftover characters from stdin
+    // Automatically resize the dstring
+    // Add the newly read char to the dstring and null terminator
+    while (feof(fp) == 0) {
+        c = fgetc(fp);
+        if (c == '\n') {
+            break;
+        }
+        dresize(dstr, dstr->buf + 1);
+        dstr->str[dstr->buf - 2] = c;
+        dstr->str[dstr->buf - 1] = '\0';
+    }
+
+    // Free input
+    free(input);
+
+    // End
+    return 0;
 }
