@@ -1,13 +1,14 @@
 # dstring-library
 
-The dstring.h header file is a library I made partially for a fun exercise, and also
-to vent some frustration with the way C strings are. A dstring can be dynamically
-resized, and has its buffer size stored inside it. Check the main.c file for reference
-on how to use the library and its functions. It should be pretty simple, considering a
-dstring is just a char* and size_t inside a struct.
+The dstring.h header is a fun project and exercise born out of
+my personal frustration with how C strings generally are. I
+basically wanted to see if I can make strings safe(r) in C.
 
-I also remade a bunch of the string.h functions to have a third argument, n. N is used 
-to specify an upper limit to those functions and prevent buffer overflows. I think most
-of these already exist in the C standard, but idk so I made them anyways
+The name "dstring" is short for "dynamic string" and consists
+of a struct with just two elements, a character pointer and a
+size_t for its buffer size. By doing this, every function that
+interacts with a dstring has access to its buffer size, even
+if its changed used 'resize_dstr.'
 
-Let me know if something sucks. Might fix it, might not log on for another 4 months. idk.
+See 'main.c' for more information on how to use a dstring and
+the functions used to interact with one.
