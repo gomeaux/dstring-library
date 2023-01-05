@@ -11,4 +11,5 @@ interacts with a dstring has access to its buffer size, even
 if its changed used 'resize_dstr.'
 
 See 'main.c' for more information on how to use a dstring and
-the functions used to interact with one.
+the functions used to interact with one. Let me know if you
+find anything horribly wrong and I'll attempt to fix it.
