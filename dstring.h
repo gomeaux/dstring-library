@@ -1,181 +1,161 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-// Returns C string length up until a given limit
-size_t strlen_n(const char* start, size_t n) {
-	const char* end;
-	for (end = start; *end != '\0'; ++end) {
-		if (end - start == n) {
-			return n;
-		}
-	}
-	return end - start;
-}
-
-// Concatenates two C strings with given size of 'dest'
-char* strcat_n(char* dest, const char* src, size_t n) {
-    char* ptr = dest + strlen_n(dest, n);
-    while (*src != '\0' && strlen_n(dest, n) < n) {
-        //*ptr++ = *src++;
-        *ptr = *src;
-        ptr++;
-        src++;
-    }
-    *ptr = '\0';
-    return dest;
-}
-
-// Searches for the first instance of 'c' in 'str' until n characters
-char* strchr_n(const char* str, int c, size_t n) {
-    size_t i = 0;
-    while (i < n) {
-        if (str[i] == c) {
-            return (char*)&str[i];
-        }
-        i++;
-    }
-    return NULL;
-}
-
-// Compares the two strings until n characters
-int strcmp_n( const char *s1, const char *s2, size_t n ) {
-    const unsigned char *p1 = (const unsigned char*)s1;
-    const unsigned char *p2 = (const unsigned char*)s2;
-    size_t i = 0;
-    while (( *p1 && *p1 == *p2 ) && (i < n) ){
-        p1++;
-        p2++;
-        i++;
-    }
-
-    return ( *p1 > *p2 ) - ( *p2  > *p1 );
-}
-
-// Copies n characters from src into dest
-char* strcpy_n(char *dest, const char *src, size_t n) {
-    size_t i = 0;
-    while (i < n) {
-        dest[i] = src[i];
-        if (src[i] == '\0') {
-            break;
-        }
-        i++;
-    }
-    return dest;
-}
-
-// Dynamic string stucture
+/* DSTRING STRUCTURE */
 typedef struct dstring {
-	char* str;
-	size_t buf;
+    char* str;
+    size_t buf;
 } dstring;
 
-// Returns a pointer to an initialized dstring
-dstring* initdstr() {
+/* you already know fr fr*/
+#include <stdlib.h>
+
+/* Getter functions */
+char* get_dstr(dstring* dstr) { return dstr->str; }
+size_t dstr_buf(dstring* dstr) { return dstr->buf; }
+size_t dstr_len(dstring* dstr) {
+    const char* end;
+    for (end = dstr->str; *end != '\0'; ++end) {
+        if (end - dstr->str == dstr->buf - 1) {
+            return dstr->buf - 1;
+        }
+    }
+    return end - dstr->str;
+}
+
+/* Returns a specific character from the dstring */
+/* Acts as the [] operators. doing index(dstr, 0) returns dstr->str[0] */
+/* might remove this idk if its going to be useful*/
+int index_dstr(dstring* dstr, size_t i) {
+    if (i < 0 || i > dstr->buf - 1) {
+        return -1;
+    }
+    return dstr->str[i];
+}
+
+/* Returns a pointer to an initialized dstring */
+dstring* init_dstr() {
+
+    /* Allocate memory on the heap for dstring*/
     dstring* dstr = (dstring*)malloc(sizeof(dstring) * 1);
-    dstr->buf = 1;
+
+    dstr->buf = 1; /* Setup member values*/
     dstr->str = (char*)malloc(sizeof(char) * dstr->buf);
     dstr->str[dstr->buf - 1] = '\0';
+
+    /* End*/
     return dstr;
 }
 
-// Deletes the dstring
-int freedstr(dstring* dstr) {
-    //free(dstr->str);+++++++++++++++++++++++++
-    free(dstr);
+/* Frees a single dstring* */
+int free_dstr(dstring* dstr) {
     free(dstr->str);
+    dstr->str = NULL;
+    free(dstr);
+    dstr = NULL;
     return 0;
 }
 
-// Returns the dstrings buffer size
-size_t dstrbuf(dstring* dstr) {
-    return dstr->buf;
-}
-
-// Returns the length of the dstrings member C string
-size_t dstrlen(dstring* dstr) {
-    return strlen_n(dstr->str, dstr->buf);
-}
-
-// Resizes the dstring to a given new size
-// Any previous characters that still fit in the newly sized string are kept
-int dresize(dstring* dstr, size_t newsize) {
-	if (newsize < 1) {return 1;}
+/* Resizes the dstring. Keeps or cuts down pevious contents */
+/* Still ensures that the last character is a null terminator*/
+int resize_dstr(dstring* dstr, size_t newsize) {
+    dstring* temp = dstr;
+	if (newsize < 1) { return 1; }
 	dstr->buf = newsize;
 	dstr->str = (char*)realloc(dstr->str, newsize);
 	dstr->str[dstr->buf - 1] = '\0';
+    if (temp != dstr) { free_dstr(temp); }
 	return 0;
 }
 
-// copies a C string into a dstring
-int dstrcpy(dstring* des, char* src) {
-	size_t i;
-	for (i = 0; i < des->buf - 1; i++) {
-		des->str[i] = src[i];
-	}
-	return i;
-}
+/* Read a line from a stdin into dstring */
+/* Does not resize the dstring           */
+char* read_dstr(dstring* dstr) {
 
-// Returns a pointer to the dstrings member C string
-char* getdstr(dstring* dstr) {
+    /* Variables */
+    size_t i = 0;
+
+    /* read from stdin */
+    if (fgets(dstr->str, dstr->buf, stdin) == NULL) {
+        return NULL;
+    }
+
+    /* Get rid of trailing '\n' if it exists */
+    /* Ensure that buf - 1 is also a newline*/
+    for (i = 0; i < dstr->buf; i++) {
+        if (dstr->str[i] == '\n' || dstr->str[i] == '\0') {
+            dstr->str[i] = '\0';
+            break;
+        }
+    }
+    dstr->str[dstr->buf - 1] = '\0';
+
+    /* End */
     return dstr->str;
 }
 
-// Read a line from a file into the dstring
-// set 'fp' to 'stdin' for keyboard input
-int staticsize_readdstr(dstring* dstr, FILE* fp) {
-	char* input = (char*)malloc(sizeof(char) * dstr->buf);
-	size_t i = 0;
-	fgets(input, dstr->buf, fp);
-	for (i = 0; i < dstr->buf; i++) {
-		if (input[i] == '\n') {
-			dstr->str[i] = '\0';
-			break;
-		} else {
-			dstr->str[i] = input[i];
-		}
-	}
-	free(input);
-	return 0;
-}
+/* Read a line from stdin into dstring */
+/* Will resize the dstring if necessary*/
+char* rread_dstr(dstring* dstr) {
 
-// Same as 'readdstr' but it automatically resizes the
-// dstring to fit the inputted string
-// Returns how many by how many chars the dstring increased
-int autoresize_readdstr(dstring* dstr, FILE* fp) {
+    /* Variables */
+    char c = (char)0;
 
-    // Variables
-    char* input = (char*)malloc(sizeof(char) * dstr->buf);
-    size_t i = 0;
-    char c = 0;
+    /* Use read_dstr to read from stdin */
+    if (read_dstr(dstr) == NULL) {
+        return NULL;
+    }
 
-    // Read input from stdin
-    fgets(input, dstr->buf, fp);
-	for (i = 0; i < dstr->buf; i++) {
-		if (input[i] == '\n') {
-			dstr->str[i] = '\0';
-			break;
-		} else {
-			dstr->str[i] = input[i];
-		}
-	}
-
-    // Read any 'leftover characters from stdin
-    // Automatically resize the dstring
-    // Add the newly read char to the dstring and null terminator
-    while (feof(fp) == 0) {
-        c = fgetc(fp);
-        if (c == '\n') {
-            break;
+    /* For every char leftover in stdin, increment
+    the dstring and add the character. I have nightmares
+    about people actually reading my code */
+    while (feof(stdin) == 0) {
+        c = fgetc(stdin);
+        if (c == '\n') { break; }
+        if (dstr_len(dstr) == dstr->buf - 1) {
+            resize_dstr(dstr, dstr->buf + 1);
         }
-        dresize(dstr, dstr->buf + 1);
         dstr->str[dstr->buf - 2] = c;
         dstr->str[dstr->buf - 1] = '\0';
     }
 
-    // Free input
-    free(input);
+    /* End */
+    return dstr->str;
+}
 
-    // End
-    return 0;
+/* Reads a line from a file, does not resize the dstring */
+/* Includes the newline character at the end if found. */
+/* This is basically a wrapper for fgets */
+char* fread_dstr(dstring* dstr, FILE* fp) {
+
+    /* Read from file */
+    if (fgets(dstr->str, dstr->buf, fp) == NULL) {
+        return NULL;
+    }
+
+    /* End */
+    return dstr->str;
+}
+
+/* Reads a line from a file, resize the dstring if necessary */
+/* Like the previous function, this wraps fgets and includes newlines */
+/* If it encounters a newline or EOF is reached, then it stops reading*/
+char* frread_dstr(dstring* dstr, FILE* fp) {
+
+    /* Variables */
+    char c = 0;
+
+    /* Read from file */
+    if (fread_dstr(dstr, fp) == NULL) {
+        return NULL;
+    }
+
+    /* Keep adding characters until newline or EOF */
+    /* Remember to include BOTH '\n' if found AND '\0' */
+    while (feof(fp) == 0) {
+        c = fgetc(fp);
+        if (dstr_len(dstr) == dstr->buf - 1) {
+            resize_dstr(dstr, dstr->buf + 1);
+        }
+        dstr->str[dstr->buf - 2] = c;
+        dstr->str[dstr->buf - 1] = '\0';
+        if (c == '\n') { break; }
+    }
 }
