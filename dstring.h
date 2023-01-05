@@ -1,3 +1,7 @@
+/* Defines a THING to indicate whether 'dstring.h' has already been included */
+#ifndef DSTRING_H
+#define DSTRING_H
+
 /* DSTRING STRUCTURE */
 typedef struct dstring {
     char* str;
@@ -159,3 +163,6 @@ char* frread_dstr(dstring* dstr, FILE* fp) {
         if (c == '\n') { break; }
     }
 }
+
+/* End of header */
+#endif
